@@ -4,19 +4,35 @@ library ieee;
 	
 entity eval is
 
-generic (N_ECDF : natural := 16);
+generic(Nbits : natural := 9;
+		  Nbins : natural := 512);
 
-port(	ECDF_exp : in  std_logic_vector(N_ECDF - 1 downto 0);
-		ECDF_teo : in  std_logic_vector(N_ECDF - 1 downto 0);
-		error    : out std_logic_vector(N_ECDF - 1 downto 0)
+port(	ECDF_exp : in  std_logic_vector(Nbits - 1 downto 0);
+		ECDF_teo : in  std_logic_vector(Nbits - 1 downto 0);
+		clk, rst : in std_logic;
+		     SAD : out std_logic_vector(Nbits - 1 downto 0)
 		);
 		
 end entity;
 
 architecture rtl of eval is
-
+	
+	signal error_reg : std_logic_vector(Nbits - 1 downto 0);
+	signal 	  error : std_logic_vector(Nbits - 1 downto 0);
+	
 begin
 
-	error <= std_logic_vector(abs(signed(ECDF_exp) - signed(ECDF_teo)));
+	error <= std_logic_vector(abs(signed(ECDF_exp) - signed(ECDF_teo)) + signed(error_reg));
 
+	process(ECDF_exp,ECDF_teo)
+	begin
+		if rst = '0' then
+			error_reg <= (others => '0');
+		elsif rising_edge(clk) then
+			error_reg <= error;
+		end if;
+	end process;
+	
+	SAD <= error_reg;
+	
 end rtl;
