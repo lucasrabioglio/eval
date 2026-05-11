@@ -4,12 +4,12 @@ library ieee;
 	
 entity eval is
 
-generic(Nbits : natural := 9;
+generic(Nbits : natural := 18;   -- Estos 18 bits son de multiplicar 9bits*512, es decir, desplazo 9 lugares
 		  Nbins : natural := 512);
 
 port(	ECDF_exp : in  std_logic_vector(Nbits - 1 downto 0);
 		ECDF_teo : in  std_logic_vector(Nbits - 1 downto 0);
-		clk, rst : in std_logic;
+		clk, rst : in  std_logic;
 		     SAD : out std_logic_vector(Nbits - 1 downto 0)
 		);
 		
@@ -23,7 +23,7 @@ architecture rtl of eval is
 begin
 
 	error <= std_logic_vector(abs(signed(ECDF_exp) - signed(ECDF_teo)) + signed(error_reg));
-
+	
 	process(ECDF_exp,ECDF_teo)
 	begin
 		if rst = '0' then
